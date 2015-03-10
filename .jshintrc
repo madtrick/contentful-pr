@@ -15,5 +15,15 @@
   "maxdepth": 3,
   "maxlen": 100,
   "nomen": true,
-  "trailing": true
+  "trailing": true,
+  "globals" : {
+      "it"         : false,
+      "xit"        : false,
+      "describe"   : false,
+      "xdescribe"  : false,
+      "beforeEach" : false,
+      "afterEach"  : false,
+      "expect"     : false,
+      "spyOn"      : false
+    }
 }
