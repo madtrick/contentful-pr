@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var optimist = require('optimist');
+var fs       = require('fs');
+var homedir  = require('home-dir');
+
+var CONFIG_FILE_PATH = '.contentful-pr';
+var argv             = optimist.argv;
+var options          = {
+  base     : argv.base,
+  template : argv.template,
+  'tp-id'  : argv['tp-id'],
+  assignee : argv.assignee
+};
+
+
+fs.readFile(homedir(CONFIG_FILE_PATH), function(err, data) {
+  var config;
+
+  if (!data) {
+    throw new Error('Missing config file');
+  }
+
+  config = JSON.parse(data);
+
+  require('../lib/logging').logger({enabled: argv.verbose});
+  require('..')(config, options);
+});
