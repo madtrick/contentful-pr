@@ -5,7 +5,7 @@ module.exports = function (config) {
 
     basePath: '',
 
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'sinon'],
 
     files: [
       'tests/**/*.js'
