@@ -1,11 +1,9 @@
 'use strict';
 
 var gulp  = require('gulp');
-var karma = require('karma').server;
+var mocha = require('gulp-mocha');
 
-gulp.task('test', function (done) {
-  karma.start({
-    configFile: __dirname + '/karma.conf.js',
-    singleRun: true
-  }, done);
+gulp.task('test', function () {
+  return gulp.src('tests/**.js', {read: false})
+          .pipe(mocha({reporter: 'nyan'}));
 });

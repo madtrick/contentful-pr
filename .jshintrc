@@ -24,7 +24,6 @@
       "beforeEach" : false,
       "afterEach"  : false,
       "expect"     : false,
-      "spyOn"      : false,
-      "sinon"      : false
+      "spyOn"      : false
     }
 }
