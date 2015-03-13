@@ -17,7 +17,7 @@ var options          = {
 };
 
 fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
-  var logger = require('../lib/logging').logger({enabled: argv.verbose});
+  var logger = require('../lib/logging').logger({verbose: argv.verbose});
   var config;
 
   if (!data) {
