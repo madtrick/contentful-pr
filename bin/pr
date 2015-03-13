@@ -5,6 +5,7 @@
 var optimist = require('optimist');
 var fs       = require('fs');
 var homedir  = require('home-dir');
+var configurationValidator = require('../lib/configuration-validator');
 
 var CONFIG_FILE_PATH = '.contentful-pr';
 var argv             = optimist.argv;
@@ -15,8 +16,8 @@ var options          = {
   assignee : argv.assignee
 };
 
-
-fs.readFile(homedir(CONFIG_FILE_PATH), function(err, data) {
+fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
+  var logger = require('../lib/logging').logger({enabled: argv.verbose});
   var config;
 
   if (!data) {
@@ -25,6 +26,10 @@ fs.readFile(homedir(CONFIG_FILE_PATH), function(err, data) {
 
   config = JSON.parse(data);
 
-  require('../lib/logging').logger({enabled: argv.verbose});
+  if (!configurationValidator(config)) {
+    logger.error('Some of the configuration parameters are invalid');
+    return;
+  }
+
   require('..')(config, options);
 });
