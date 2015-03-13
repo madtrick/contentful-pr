@@ -59,6 +59,19 @@ describe('Repository', function () {
       });
     });
 
+    it('pushes the current branch to the remote', function (done) {
+      this.repository.push()
+      .then( function () {
+        var args   = this.gitty.push.args[0];
+        var remote = args[0];
+        var branch = args[1];
+
+        expect(remote).to.equal('origin');
+        expect(branch).to.equal('feature-branch');
+        done();
+      });
+    });
+
     describe('when logging is enabled', function () {
       describe('when push succeeds', function () {
         it('logs to stdout', function () {
