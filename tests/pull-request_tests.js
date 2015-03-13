@@ -2,7 +2,7 @@
 
 require('./helpers');
 
-var logger      = require('../lib/logging').logger({enabled: false});
+var logger      = require('../lib/logging').logger({verbose: false});
 var PullRequest = require('../lib/pull-request');
 
 describe('PullRequest', function () {
@@ -57,6 +57,13 @@ describe('PullRequest', function () {
         it('logs to stdout', function () {
           expect(logger.info.calledOnce).to.be(true);
         });
+
+        it('logs the pull request number', function () {
+          var args = logger.info.getCall(0).args;
+
+          expect(args[0]).to.equal('created PR #');
+          expect(args[1]).to.equal(1);
+        });
       });
     });
   });
@@ -85,10 +92,15 @@ describe('PullRequest', function () {
     });
 
     describe('on successful assignation', function () {
-      describe('when logging is enabled', function () {
-        it('logs to stdout', function () {
-          expect(logger.info.calledOnce).to.be(true);
-        });
+      it('logs to stdout', function () {
+        expect(logger.info.calledOnce).to.be(true);
+      });
+
+      it('logs the assignee name', function () {
+        var args = logger.info.getCall(0).args;
+
+        expect(args[0]).to.equal('assigned PR to');
+        expect(args[1]).to.equal('he');
       });
     });
   });

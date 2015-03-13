@@ -72,13 +72,21 @@ describe('Repository', function () {
       });
     });
 
-    describe('when logging is enabled', function () {
-      describe('when push succeeds', function () {
-        it('logs to stdout', function () {
-          this.repository.push()
-          .then( function () {
-            expect(logger.info.calledOnce).to.be(true);
-          });
+    describe('when push succeeds', function () {
+      it('logs to stdout', function () {
+        this.repository.push()
+        .then( function () {
+          expect(logger.info.calledOnce).to.be(true);
+        });
+      });
+
+      it('logs the name of the pushed branch', function () {
+        this.repository.push()
+        .then( function () {
+          var args = logger.info.getCall(0).args;
+
+          expect(args[0]).to.equal('Pushed branch');
+          expect(args[1]).to.equal('feature-branch');
         });
       });
     });
