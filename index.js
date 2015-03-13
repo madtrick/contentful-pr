@@ -4,72 +4,16 @@ var Promise     = require('bluebird');
 var gitty       = require('gitty');
 var GithubAPI   = require('github');
 var editor      = require('editor');
-var extend      = require('extend');
 var temp        = require('temp');
 var fs          = require('fs');
 var path        = require('path');
 var tpAPI       = require('tp-api');
 var logger      = require('./lib/logging').logger();
 var Repository  = require('./lib/repository');
+var PullRequest = require('./lib/pull-request');
 var revalidator = require('revalidator');
 
 var github, targetprocess;
-
-var PullRequest = PullRequest;
-function PullRequest (options) {
-  this.options = options;
-}
-
-PullRequest.prototype.setupRepo = function (repo) {
-  this.repo = repo;
-};
-
-PullRequest.prototype.create = function (options) {
-  var data = {
-    user: this.repo.config.ownerName,
-    title: options.title,
-    body: options.body,
-    repo: this.repo.config.name,
-    base: this.options.base,
-    head: this.repo.config.currentBranchName
-  };
-
-  return Promise.promisify(github.pullRequests.create)(data)
-  .bind(this)
-  .then( function (data) {
-    logger.info('created PR #', data.number);
-    this.url    = data.url;
-    this.number = data.number;
-  });
-};
-
-PullRequest.prototype.assign = function () {
-  var data;
-
-  if (!this.options.assignee) {
-    return Promise.resolve(this);
-  }
-
-  data = extend(this._buildDefaultOptions(), {
-    number   : this.number,
-    assignee : this.options.assignee
-  });
-
-  return Promise.promisify(github.issues.edit)(data)
-  .bind(this)
-  .then( function () {
-    logger.info('assigned PR to', data.assignee);
-    return this;
-  });
-};
-
-PullRequest.prototype._buildDefaultOptions = function () {
-  return {
-    user: this.repo.config.ownerName,
-    repo: this.repo.config.name,
-    head: this.repo.config.currentBranchName
-  };
-};
 
 module.exports = run;
 function run (config, options) {
@@ -131,7 +75,7 @@ function run (config, options) {
 
   targetprocess = tpAPI(config.credentials.targetprocess);
 
-  var pr   = new PullRequest(prOptions);
+  var pr   = new PullRequest(github, prOptions);
   var repo = new Repository(gitty);
 
   repo
