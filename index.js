@@ -1,6 +1,7 @@
 'use strict';
 
 var Promise     = require('bluebird');
+var gitty       = require('gitty');
 var GithubAPI   = require('github');
 var editor      = require('editor');
 var extend      = require('extend');
@@ -131,7 +132,7 @@ function run (config, options) {
   targetprocess = tpAPI(config.credentials.targetprocess);
 
   var pr   = new PullRequest(prOptions);
-  var repo = new Repository();
+  var repo = new Repository(gitty);
 
   repo
   .setup()
