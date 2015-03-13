@@ -10,6 +10,9 @@ describe('PullRequest', function () {
     this.github = {
       pullRequests: {
         create: sinon.stub().callsArgWith(1, null, {url: 'pr-url', number: 1})
+      },
+      issues: {
+        edit: sinon.stub().callsArgWith(1, null)
       }
     };
 
@@ -55,7 +58,38 @@ describe('PullRequest', function () {
           expect(logger.info.calledOnce).to.be(true);
         });
       });
+    });
+  });
 
+  describe('#assign', function () {
+    beforeEach(function () {
+      this.options = {
+        user: 'me',
+        repo: 'the-repo',
+        head: 'feature/another-branch',
+        number: 1,
+        assignee: 'he'
+      };
+
+      this.pullRequest.assign(this.options);
+    });
+
+    it('edits the pull request', function () {
+      expect(this.github.issues.edit.calledOnce).to.be(true);
+    });
+
+    it('edits the pull request and assigns it', function () {
+      var data = this.github.issues.edit.getCall(0).args[0];
+
+      expect(data).to.equal(this.options);
+    });
+
+    describe('on successful assignation', function () {
+      describe('when logging is enabled', function () {
+        it('logs to stdout', function () {
+          expect(logger.info.calledOnce).to.be(true);
+        });
+      });
     });
   });
 });
