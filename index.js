@@ -4,7 +4,6 @@ var Promise     = require('bluebird');
 var gitty       = require('gitty');
 var GithubAPI   = require('github');
 var tpAPI       = require('tp-api');
-var logger      = require('./lib/logging').logger();
 var Repository  = require('./lib/repository');
 var PullRequest = require('./lib/pull-request');
 var prMessage   = require('./lib/pull-request-message');
