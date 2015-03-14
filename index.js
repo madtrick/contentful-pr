@@ -13,17 +13,10 @@ var github, targetprocess;
 
 module.exports = run;
 function run (config, options) {
-  var prOptions = {
-    base     : options.base || 'master',
-    assignee : options.assignee
-  };
-
   github = new GithubAPI({ version: '3.0.0' });
   github.authenticate(config.credentials.github);
-
   targetprocess = tpAPI(config.credentials.targetprocess);
 
-  var pr   = new PullRequest(github, prOptions);
   var repo = new Repository(gitty);
 
   repo.push()
@@ -34,39 +27,56 @@ function run (config, options) {
       repo.getRemoteRepoName(),
       prMessage(options.template, options['tp-id'])
     ])
-    .then(function (resolves) {
-      var branch  = resolves[0];
-      var user    = resolves[1];
-      var repo    = resolves[2];
-      var message = resolves[3];
+    .spread( function (branch, user, repo, message) {
+      var pr   = new PullRequest(github, {
+        base     : options.base || 'master',
+        assignee : options.assignee,
+        branch   : branch,
+        user     : user,
+        repo     : repo
+      });
 
-      pr.create({
-        title: message.title,
-        body: message.body,
-        user: user,
-        repo: repo,
-        base: 'master',
-        head: branch
-      })
-      .then( function () {
-              return pr.assign({
-                user: user,
-                repo: repo,
-                head: branch,
-                number: pr.number,
-                assignee: options.assignee
-              });
-            })
-            .then( function () {
-              var comment = 'Submitted Pull Request ' + pr.url;
-              targetprocess().comment(options['tp-id'], comment, function (error) {
-                if (error) {
-                  logger.error(error);
-                } else {
-                  logger.info('Commented on Target Process entity #', options['tp-id']);
-                }
-              });
-            });
+      createPullRequest(pr, message)
+      .error(handle_cannotCreatePullRequest)
+      .then(assignPullRequest)
+      .then(commentOnTargetProcess(options['tp-id']));
     });
   });
+}
+
+function createPullRequest (pullRequest, message) {
+  return pullRequest.create({
+    title: message.title,
+    body: message.body
+  });
+}
+
+function handle_cannotCreatePullRequest (exception) {
+  var exceptionBody = JSON.parse(exception.message);
+
+  logger.error('Can\'t create pull request:');
+  exceptionBody.errors.forEach(function (error) {
+    logger.error('\t*', error.message, '\n');
+  });
+
+  process.exit(1);
+}
+
+function assignPullRequest () {
+  return function (pullRequest) {
+    return pullRequest.assign();
+  };
+}
+
+function commentOnTargetProcess (tpEntityId) {
+  return function (pullRequest) {
+    var comment = 'Submitted Pull Request ' + pullRequest.url;
+    targetprocess().comment(tpEntityId, comment, function (error) {
+      if (error) {
+        logger.error(error);
+      } else {
+        logger.info('Commented on Target Process entity #', tpEntityId);
+      }
+    });
+  };
 }
