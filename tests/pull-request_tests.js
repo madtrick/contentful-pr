@@ -2,7 +2,6 @@
 
 require('./helpers');
 
-var extend = require('extend');
 var logger      = require('../lib/logging').logger({verbose: false});
 var PullRequest = require('../lib/pull-request');
 
@@ -17,6 +16,14 @@ describe('PullRequest', function () {
       }
     };
 
+    this.pullRequestOptions = {
+      user: 'me',
+      repo: 'the-repo',
+      base: 'master',
+      branch: 'feature/another-branch',
+      assignee: 'he'
+    };
+
     sinon.spy(logger, 'info');
 
     this.pullRequest = new PullRequest(this.github, {});
@@ -24,16 +31,9 @@ describe('PullRequest', function () {
 
   describe('#create', function () {
     beforeEach(function () {
-      this.options = {
-        user: 'me',
-        repo: 'the-repo',
-        base: 'master',
-        head: 'feature/another-branch'
-      };
-
       this.message = {title: 'PR title', body: 'PR body'};
 
-      this.pullRequest = new PullRequest(this.github, this.options);
+      this.pullRequest = new PullRequest(this.github, this.pullRequestOptions);
       this.pullRequest.create(this.message);
     });
 
@@ -44,7 +44,14 @@ describe('PullRequest', function () {
     it('creates a pull request with the expected arguments', function () {
       var data = this.github.pullRequests.create.getCall(0).args[0];
 
-      expect(data).to.eql(extend(this.message, this.options));
+      expect(data).to.eql({
+        title : this.message.title,
+        body  : this.message.body,
+        base  : this.pullRequestOptions.base,
+        user  : this.pullRequestOptions.user,
+        head  : this.pullRequestOptions.branch,
+        repo  : this.pullRequestOptions.repo
+      });
     });
 
     describe('on successful creation', function () {
@@ -73,15 +80,7 @@ describe('PullRequest', function () {
 
   describe('#assign', function () {
     beforeEach(function () {
-      this.options = {
-        user: 'me',
-        repo: 'the-repo',
-        branch: 'feature/another-branch',
-        base: 'master',
-        assignee: 'he'
-      };
-
-      this.pullRequest        = new PullRequest(this.github, this.options);
+      this.pullRequest        = new PullRequest(this.github, this.pullRequestOptions);
       this.pullRequest.number = 1;
       this.pullRequest.assign();
     });
@@ -94,11 +93,11 @@ describe('PullRequest', function () {
       var data = this.github.issues.edit.getCall(0).args[0];
 
       expect(data).to.eql({
-        user     : this.options.user,
-        head     : this.options.branch,
-        repo     : this.options.repo,
-        number   : this.pullRequest.number,
-        assignee : this.options.assignee
+        user     : this.pullRequestOptions.user,
+        head     : this.pullRequestOptions.branch,
+        repo     : this.pullRequestOptions.repo,
+        assignee : this.pullRequestOptions.assignee,
+        number   : this.pullRequest.number
       });
     });
 
