@@ -2,6 +2,7 @@
 
 require('./helpers');
 
+var extend = require('extend');
 var logger      = require('../lib/logging').logger({verbose: false});
 var PullRequest = require('../lib/pull-request');
 
@@ -24,16 +25,18 @@ describe('PullRequest', function () {
   describe('#create', function () {
     beforeEach(function () {
       this.options = {
-        title: 'PR title',
-        body: 'PR body',
         user: 'me',
         repo: 'the-repo',
         base: 'master',
         head: 'feature/another-branch'
       };
 
-      this.pullRequest.create(this.options);
+      this.message = {title: 'PR title', body: 'PR body'};
+
+      this.pullRequest = new PullRequest(this.github, this.options);
+      this.pullRequest.create(this.message);
     });
+
     it('creates a pull request', function () {
       expect(this.github.pullRequests.create.calledOnce).to.be(true);
     });
@@ -41,7 +44,7 @@ describe('PullRequest', function () {
     it('creates a pull request with the expected arguments', function () {
       var data = this.github.pullRequests.create.getCall(0).args[0];
 
-      expect(data).to.equal(this.options);
+      expect(data).to.eql(extend(this.message, this.options));
     });
 
     describe('on successful creation', function () {
@@ -73,12 +76,14 @@ describe('PullRequest', function () {
       this.options = {
         user: 'me',
         repo: 'the-repo',
-        head: 'feature/another-branch',
-        number: 1,
+        branch: 'feature/another-branch',
+        base: 'master',
         assignee: 'he'
       };
 
-      this.pullRequest.assign(this.options);
+      this.pullRequest        = new PullRequest(this.github, this.options);
+      this.pullRequest.number = 1;
+      this.pullRequest.assign();
     });
 
     it('edits the pull request', function () {
@@ -88,7 +93,13 @@ describe('PullRequest', function () {
     it('edits the pull request and assigns it', function () {
       var data = this.github.issues.edit.getCall(0).args[0];
 
-      expect(data).to.equal(this.options);
+      expect(data).to.eql({
+        user     : this.options.user,
+        head     : this.options.branch,
+        repo     : this.options.repo,
+        number   : this.pullRequest.number,
+        assignee : this.options.assignee
+      });
     });
 
     describe('on successful assignation', function () {
