@@ -21,7 +21,8 @@ fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
   var config;
 
   if (!data) {
-    throw new Error('Missing config file');
+    logger.error('Missing config file');
+    return;
   }
 
   config = JSON.parse(data);
