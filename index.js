@@ -4,6 +4,7 @@ var Promise     = require('bluebird');
 var gitty       = require('gitty');
 var GithubAPI   = require('github');
 var tpAPI       = require('tp-api');
+var logger      = require('./lib/logging').logger();
 var Repository  = require('./lib/repository');
 var PullRequest = require('./lib/pull-request');
 var prMessage   = require('./lib/pull-request-message');
@@ -16,7 +17,6 @@ function run (config, options) {
     base     : options.base || 'master',
     assignee : options.assignee
   };
-
 
   github = new GithubAPI({ version: '3.0.0' });
   github.authenticate(config.credentials.github);
@@ -49,12 +49,22 @@ function run (config, options) {
         head: branch
       })
       .then( function () {
-              pr.assign({
+              return pr.assign({
                 user: user,
                 repo: repo,
                 head: branch,
                 number: pr.number,
                 assignee: options.assignee
+              });
+            })
+            .then( function () {
+              var comment = 'Submitted Pull Request ' + pr.url;
+              targetprocess().comment(options['tp-id'], comment, function (error) {
+                if (error) {
+                  logger.error(error);
+                } else {
+                  logger.info('Commented on Target Process entity #', options['tp-id']);
+                }
               });
             });
     });
