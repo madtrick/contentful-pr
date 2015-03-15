@@ -13,6 +13,8 @@ var argv = optimist
   .describe('a', 'Github name of the pull request assignee')
   .alias('b', 'base')
   .describe('b', 'Specify the base branch to merge the pull request into')
+  .alias('h', 'help')
+  .describe('h', 'This help')
   .alias('t', 'template')
   .alias('v', 'verbose')
   .describe('v', 'Be verbose')
