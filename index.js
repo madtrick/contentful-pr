@@ -71,6 +71,10 @@ function assignPullRequest (pullRequest) {
 }
 
 function commentOnTargetProcess (tpEntityId) {
+  if (!tpEntityId) {
+    return function () {};
+  }
+
   return function (pullRequest) {
     var comment = 'Submitted Pull Request ' + pullRequest.url;
     targetprocess().comment(tpEntityId, comment, function (error) {
