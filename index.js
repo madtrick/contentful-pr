@@ -63,7 +63,11 @@ function handle_cannotCreatePullRequest (exception) {
 }
 
 function assignPullRequest (pullRequest) {
-  return pullRequest.assign();
+  if (pullRequest.options.assignee) {
+    return pullRequest.assign();
+  } else {
+    return Promise.resolve(pullRequest);
+  }
 }
 
 function commentOnTargetProcess (tpEntityId) {
