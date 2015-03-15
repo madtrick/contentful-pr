@@ -1,7 +1,7 @@
 {
   "name": "spr",
   "version": "0.0.0",
-  "description": "",
+  "description": "Utility with some goodies to create Github pull requests",
   "main": "index.js",
   "scripts": {
     "test": "gulp test"
