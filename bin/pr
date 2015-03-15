@@ -23,7 +23,7 @@ var argv = optimist
   .argv
   ;
 
-var CONFIG_FILE_PATH = '.contentful-pr';
+var CONFIG_FILE_PATH = '.spr';
 var options          = {
   base     : argv.base,
   template : argv.template,

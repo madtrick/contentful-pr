@@ -12,7 +12,7 @@ describe('Repository', function () {
         cb(null, {current: 'feature-branch'});
       },
       getRemotes: function (cb) {
-        cb(null, {origin: 'git@github.com:madtrick/contentful-pr.git'});
+        cb(null, {origin: 'git@github.com:madtrick/spr.git'});
       },
       push: sinon.spy(function (_remote, _branch, _params, cb) {
         cb(null);
@@ -45,7 +45,7 @@ describe('Repository', function () {
   it('#getRemoteRepoName', function (done) {
     this.repository.getRemoteRepoName()
     .then( function (repoName) {
-      expect(repoName).to.equal('contentful-pr');
+      expect(repoName).to.equal('spr');
       done();
     });
   });
