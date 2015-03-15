@@ -7,12 +7,25 @@ var fs       = require('fs');
 var homedir  = require('home-dir');
 var configurationValidator = require('../lib/configuration-validator');
 
+var argv = optimist
+  .demand(['base'])
+  .alias('a', 'assignee')
+  .describe('a', 'Github name of the pull request assignee')
+  .alias('b', 'base')
+  .describe('b', 'Specify the base branch to merge the pull request into')
+  .alias('t', 'template')
+  .alias('v', 'verbose')
+  .describe('v', 'Be verbose')
+  .describe('t', 'Path to template to be used in pull request message')
+  .describe('tp', 'Id of Target Process entity')
+  .argv
+  ;
+
 var CONFIG_FILE_PATH = '.contentful-pr';
-var argv             = optimist.argv;
 var options          = {
   base     : argv.base,
   template : argv.template,
-  'tp-id'  : argv['tp-id'],
+  tp       : argv.tp,
   assignee : argv.assignee
 };
 

@@ -25,11 +25,11 @@ function run (config, options) {
       repo.getCurrentBranchName(),
       repo.getRemoteOwnerName(),
       repo.getRemoteRepoName(),
-      prMessage(options.template, options['tp-id'])
+      prMessage(options.template, options.tp)
     ])
     .spread( function (branch, user, repo, message) {
       var pr   = new PullRequest(github, {
-        base     : options.base || 'master',
+        base     : options.base,
         assignee : options.assignee,
         branch   : branch,
         user     : user,
@@ -39,7 +39,7 @@ function run (config, options) {
       createPullRequest(pr, message)
       .error(handle_cannotCreatePullRequest)
       .then(assignPullRequest)
-      .then(commentOnTargetProcess(options['tp-id']));
+      .then(commentOnTargetProcess(options.tp));
     });
   });
 }
@@ -62,10 +62,8 @@ function handle_cannotCreatePullRequest (exception) {
   process.exit(1);
 }
 
-function assignPullRequest () {
-  return function (pullRequest) {
-    return pullRequest.assign();
-  };
+function assignPullRequest (pullRequest) {
+  return pullRequest.assign();
 }
 
 function commentOnTargetProcess (tpEntityId) {
