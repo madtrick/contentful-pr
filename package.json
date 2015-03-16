@@ -1,6 +1,6 @@
 {
   "name": "spr",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Utility with some goodies to create Github pull requests",
   "main": "index.js",
   "scripts": {
