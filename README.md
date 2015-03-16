@@ -1,4 +1,4 @@
-# PR
+# SPR
 
 `spr` is a small command line utility that includes some goodies to streamline the creation of pull requests in Github.
 
@@ -48,3 +48,9 @@ $cat $HOME/.spr
   }
 }
 ```
+### Target Process integration
+
+This tool does the following regarding Target Process
+
+  * Creates a comment in the ticket referenced by the given id including a link to the created pull request
+  * Replaces the string `:tp-ticket-id:` in the message template with the given ticket id
