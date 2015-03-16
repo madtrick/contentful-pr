@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## Upcoming
+## v0.0.2 - 2015/03/16
 ### Changed
 * Expose binary in package.json file
 * Rename binary to `spr`
