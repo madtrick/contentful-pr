@@ -7,6 +7,7 @@
     "test": "gulp test"
   },
   "author": "Farruco Sanjurjo",
+  "bin": "./bin/spr",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.9.12",
