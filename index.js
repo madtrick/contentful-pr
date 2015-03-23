@@ -8,11 +8,14 @@ var logger      = require('./lib/logging').logger();
 var Repository  = require('./lib/repository');
 var PullRequest = require('./lib/pull-request');
 var prMessage   = require('./lib/pull-request-message');
+var plugins     = require('./lib/plugins');
 
 var github, targetprocess;
 
 module.exports = run;
 function run (config, options) {
+  plugins.init(config.plugins);
+
   github = new GithubAPI({ version: '3.0.0' });
   github.authenticate(config.credentials.github);
   targetprocess = tpAPI(config.credentials.targetprocess);
