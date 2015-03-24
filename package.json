@@ -18,6 +18,8 @@
     "github": "^0.2.3",
     "gitty": "^3.1.4",
     "home-dir": "^1.0.0",
+    "lodash.compact": "^3.0.0",
+    "lodash.partial": "^3.0.0",
     "optimist": "^0.6.1",
     "revalidator": "^0.3.1",
     "temp": "^0.8.1",
