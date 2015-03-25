@@ -2,12 +2,13 @@
 
 'use strict';
 
-var optimist = require('optimist');
-var fs       = require('fs');
-var homedir  = require('home-dir');
+var yargs                  = require('yargs');
+var fs                     = require('fs');
+var homedir                = require('home-dir');
+var plugins                = require('../lib/plugins');
 var configurationValidator = require('../lib/configuration-validator');
 
-var argv = optimist
+var cliOptionsReader = yargs
   .demand(['base'])
   .alias('a', 'assignee')
   .describe('a', 'Github name of the pull request assignee')
@@ -19,20 +20,17 @@ var argv = optimist
   .alias('v', 'verbose')
   .describe('v', 'Be verbose')
   .describe('t', 'Path to template to be used in pull request message')
-  .describe('tp', 'Id of Target Process entity')
-  .argv
   ;
 
 var CONFIG_FILE_PATH = '.spr';
-var options          = {
-  base     : argv.base,
-  template : argv.template,
-  tp       : argv.tp,
-  assignee : argv.assignee
-};
 
 fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
-  var logger = require('../lib/logging').logger({verbose: argv.verbose});
+  // TODO check if the argv can reevaluated after addingthe extra
+  // options comming from the plugins
+
+  var logger = require('../lib/logging').logger({verbose: true});
+  var options;
+  var argv;
   var config;
 
   if (!data) {
@@ -47,5 +45,29 @@ fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
     return;
   }
 
+  plugins.init(config.plugins);
+  cliOptionsReader = extendCliOptions(cliOptionsReader, plugins.cliOptions());
+
+  argv = cliOptionsReader.argv;
+
+  options = {
+    base     : argv.base,
+    template : argv.template,
+    assignee : argv.assignee
+  };
+
   require('..')(config, options);
 });
+
+function extendCliOptions (optionsReader, extensionOptions) {
+  return extensionOptions.reduce( function (optionsReader, option) {
+    return optionsReader.option(
+      option.short,
+      {
+        alias: option.long,
+        demand: option.required,
+        describe: option.description
+      }
+    );
+  }, optionsReader);
+}
