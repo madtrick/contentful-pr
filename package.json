@@ -19,6 +19,8 @@
     "gitty": "^3.1.4",
     "home-dir": "^1.0.0",
     "lodash.compact": "^3.0.0",
+    "lodash.isfunction": "^3.0.1",
+    "lodash.isobject": "^3.0.0",
     "lodash.partial": "^3.0.0",
     "optimist": "^0.6.1",
     "revalidator": "^0.3.1",
