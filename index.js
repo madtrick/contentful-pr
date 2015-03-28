@@ -14,8 +14,6 @@ var github, targetprocess;
 
 module.exports = run;
 function run (config, options) {
-  plugins.init(config.plugins);
-
   github = new GithubAPI({ version: '3.0.0' });
   github.authenticate(config.credentials.github);
   targetprocess = tpAPI(config.credentials.targetprocess);
@@ -28,29 +26,43 @@ function run (config, options) {
       repo.getCurrentBranchName(),
       repo.getRemoteOwnerName(),
       repo.getRemoteRepoName(),
-      prMessage(options.template, options.tp)
+      prMessage(options)
     ])
-    .spread( function (branch, user, repo, message) {
+    .spread( function (branch, user, repoName, message) {
+      options.pr = {
+        message : message
+      };
+
+      options.repo = {
+        branch : branch,
+        user   : user,
+        name   : repoName
+      };
+
       var pr   = new PullRequest(github, {
-        base     : options.base,
-        assignee : options.assignee,
-        branch   : branch,
-        user     : user,
-        repo     : repo
+        base     : options.cli.base,
+        assignee : options.cli.assignee,
+        branch   : options.repo.branch,
+        user     : options.repo.user,
+        repo     : options.repo.name
       });
 
-      createPullRequest(pr, message)
+      var context = {
+        pr: pr,
+        options: options
+      };
+
+      createPullRequest(context)
       .error(handle_cannotCreatePullRequest)
-      .then(assignPullRequest)
-      .then(commentOnTargetProcess(options.tp));
+      .then(assignPullRequest);
     });
   });
 }
 
-function createPullRequest (pullRequest, message) {
-  return pullRequest.create({
-    title: message.title,
-    body: message.body
+function createPullRequest (context) {
+  return context.pr.create({
+    title : context.options.pr.message.title,
+    body  : context.options.pr.message.body
   });
 }
 
@@ -65,11 +77,11 @@ function handle_cannotCreatePullRequest (exception) {
   process.exit(1);
 }
 
-function assignPullRequest (pullRequest) {
-  if (pullRequest.options.assignee) {
-    return pullRequest.assign();
+function assignPullRequest (context) {
+  if (context.options.assignee) {
+    return context.pr.assign();
   } else {
-    return Promise.resolve(pullRequest);
+    return Promise.resolve(context);
   }
 }
 

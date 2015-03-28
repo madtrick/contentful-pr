@@ -5,6 +5,7 @@
 var yargs                  = require('yargs');
 var fs                     = require('fs');
 var homedir                = require('home-dir');
+var extend                 = require('extend');
 var plugins                = require('../lib/plugins');
 var configurationValidator = require('../lib/configuration-validator');
 
@@ -17,9 +18,9 @@ var cliOptionsReader = yargs
   .alias('h', 'help')
   .describe('h', 'This help')
   .alias('t', 'template')
+  .describe('t', 'Path to template to be used in pull request message')
   .alias('v', 'verbose')
   .describe('v', 'Be verbose')
-  .describe('t', 'Path to template to be used in pull request message')
   ;
 
 var CONFIG_FILE_PATH = '.spr';
@@ -51,10 +52,18 @@ fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
   argv = cliOptionsReader.argv;
 
   options = {
-    base     : argv.base,
-    template : argv.template,
-    assignee : argv.assignee
+    cli: {
+      base     : argv.base,
+      template : argv.template,
+      assignee : argv.assignee
+    }
   };
+
+  options.cli = extend({},
+    options.cli,
+    collectPluginCliOptionsValues(argv, plugins.cliOptions()));
+
+  console.log(options);
 
   require('..')(config, options);
 });
@@ -70,4 +79,14 @@ function extendCliOptions (optionsReader, extensionOptions) {
       }
     );
   }, optionsReader);
+}
+
+function collectPluginCliOptionsValues (cliOptionsValues, pluginsCliOptions) {
+  return pluginsCliOptions.reduce( function (options, option) {
+    options[option.short] =
+      cliOptionsValues[option.short] ||
+      cliOptionsValues[option.long];
+
+    return options;
+  }, {});
 }
