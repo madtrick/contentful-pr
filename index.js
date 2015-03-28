@@ -3,20 +3,19 @@
 var Promise     = require('bluebird');
 var gitty       = require('gitty');
 var GithubAPI   = require('github');
-var tpAPI       = require('tp-api');
+var partial     = require('lodash.partial');
 var logger      = require('./lib/logging').logger();
 var Repository  = require('./lib/repository');
 var PullRequest = require('./lib/pull-request');
 var prMessage   = require('./lib/pull-request-message');
 var plugins     = require('./lib/plugins');
 
-var github, targetprocess;
+var github;
 
 module.exports = run;
 function run (config, options) {
   github = new GithubAPI({ version: '3.0.0' });
   github.authenticate(config.credentials.github);
-  targetprocess = tpAPI(config.credentials.targetprocess);
 
   var repo = new Repository(gitty);
 
@@ -54,7 +53,8 @@ function run (config, options) {
 
       createPullRequest(context)
       .error(handle_cannotCreatePullRequest)
-      .then(assignPullRequest);
+      .then(assignPullRequest)
+      .then(partial(plugins.triggerPluginsForHook, 'afterCreatePullRequest', options));
     });
   });
 }
@@ -83,21 +83,4 @@ function assignPullRequest (context) {
   } else {
     return Promise.resolve(context);
   }
-}
-
-function commentOnTargetProcess (tpEntityId) {
-  if (!tpEntityId) {
-    return function () {};
-  }
-
-  return function (pullRequest) {
-    var comment = 'Submitted Pull Request ' + pullRequest.url;
-    targetprocess().comment(tpEntityId, comment, function (error) {
-      if (error) {
-        logger.error(error);
-      } else {
-        logger.info('Commented on Target Process entity #', tpEntityId);
-      }
-    });
-  };
 }
