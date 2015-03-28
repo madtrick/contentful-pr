@@ -53,7 +53,6 @@ function run (config, options) {
 
       createPullRequest(context)
       .error(handle_cannotCreatePullRequest)
-      .then(assignPullRequest)
       .then(partial(plugins.triggerPluginsForHook, 'afterCreatePullRequest', options));
     });
   });
@@ -75,12 +74,4 @@ function handle_cannotCreatePullRequest (exception) {
   });
 
   process.exit(1);
-}
-
-function assignPullRequest (context) {
-  if (context.options.assignee) {
-    return context.pr.assign();
-  } else {
-    return Promise.resolve(context);
-  }
 }

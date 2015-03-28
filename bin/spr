@@ -11,8 +11,6 @@ var configurationValidator = require('../lib/configuration-validator');
 
 var cliOptionsReader = yargs
   .demand(['base'])
-  .alias('a', 'assignee')
-  .describe('a', 'Github name of the pull request assignee')
   .alias('b', 'base')
   .describe('b', 'Specify the base branch to merge the pull request into')
   .alias('h', 'help')
@@ -54,8 +52,7 @@ fs.readFile(homedir(CONFIG_FILE_PATH), function (err, data) {
   options = {
     cli: {
       base     : argv.base,
-      template : argv.template,
-      assignee : argv.assignee
+      template : argv.template
     }
   };
 
