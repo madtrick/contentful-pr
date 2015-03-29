@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Upcoming
+### Added
+- Support for plugins
+
+### Removed
+- Target Process integration
+- PR assignation
+
 ## v0.0.2 - 2015/03/16
 ### Changed
 * Expose binary in package.json file
