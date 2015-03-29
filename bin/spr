@@ -16,7 +16,7 @@ var cliOptionsReader = yargs
   .alias('h', 'help')
   .describe('h', 'This help')
   .alias('t', 'template')
-  .describe('t', 'Path to template to be used in pull request message')
+  .describe('t', 'Path to template to be used in pull request description')
   .alias('v', 'verbose')
   .describe('v', 'Be verbose')
   ;
